@@ -14,6 +14,11 @@
  */
 
 var smilePlease = function (target, callback) {
+	// function targetResolve (target) {
+	// 	if (typeof target === 'string') {
+
+	// 	}
+	// }
 	(function (tg, cb) {
 	 	"use strict";
 
@@ -21,21 +26,28 @@ var smilePlease = function (target, callback) {
 
 		function sp () {
 			(function init(sp) {
+				sp.target = tg;
 				sp.createCanvas(); 
-				sp.render(tg);
+				sp.render();
 			})(this);
 		};
 
 		sp.prototype = {
 
 			createCanvas: function () {
-				var canvas = document.getElementById('canvas');
-				canvas.setAttribute('width', '600px');
-				canvas.setAttribute('height', '600px');
+				var canvas = document.createElement('canvas');
+				canvas.setAttribute('width', this.target.offsetWidth + 'px');
+				canvas.setAttribute('height', this.target.offsetHeight + 'px');
+				this.canvas = canvas;
 				this.ctx = canvas.getContext('2d');
 
-				//document.body.appendChild(canvas);
+				document.body.appendChild(this.canvas);
 			},
+			
+			applyStyles: function () {
+				
+			},
+
 			cookBlob: function (domExtract) {
 				var xmlSer = new XMLSerializer();
 				var serialisedDom = xmlSer.serializeToString(domExtract);
@@ -59,10 +71,11 @@ var smilePlease = function (target, callback) {
 				console.log({data1});
 				return data;
 			},
-			render: function (domExtract) {
+
+			render: function () {
 				var self = this;
 				var img = new Image();
-				var svg = new Blob([this.cookBlob(domExtract)], {type: 'image/svg+xml'});
+				var svg = new Blob([this.cookBlob(this.target)], {type: 'image/svg+xml'});
 				var url = DOMURL.createObjectURL(svg);
 
 				img.onload = function () {
@@ -72,45 +85,18 @@ var smilePlease = function (target, callback) {
 
 				img.src = url;
 
-				console.log('url', url);
 			}
 
 		};
 
 		return new sp();
 
-	}(target, callback));
+	}(function(target) {
+		return typeof target === 'string' ? document.querySelector(target) : target;
+	}(target), callback));
 }
 
 __ = smilePlease; // short-hand alias.
 
-__(document.getElementById('test'));
+__('#test');
 
-
-
-
-//
-
-// var canvas = document.getElementById('canvas');
-// var ctx = canvas.getContext('2d');
-
-// var data = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
-//            '<foreignObject width="100%" height="100%">' +
-//            '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
-//              '<p> hi venkat asd</p>' +
-//            '</div>' +
-//            '</foreignObject>' +
-//            '</svg>';
-
-// var DOMURL = window.URL || window.webkitURL || window;
-
-// var img = new Image();
-// var svg = new Blob([data], {type: 'image/svg+xml'});
-// var url = DOMURL.createObjectURL(svg);
-
-// img.onload = function () {
-//   ctx.drawImage(img, 0, 0);
-//   DOMURL.revokeObjectURL(url);
-// }
-
-// img.src = url;
