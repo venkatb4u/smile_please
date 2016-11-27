@@ -1,0 +1,23 @@
+{
+  "name": "smile_please",
+  "version": "1.0.0",
+  "description": "A javascript based lib utility that can capture the screenshot of user-defined DOM set either programmatically or through elegant GUI.",
+  "main": "smilePlease.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "DEBUG=* nodemon ./example/server.js",
+    "watch": "DEBUG=* nodemon -e js,sjs,css  ./server.js",
+    "deploy": "cd ./example && http-server"
+  },
+  "repository": {
+    "url": "git@gitlab.pramati.com:venkat.subramanian/smile_please.git",
+    "type": "git"
+  },
+  "author": "Venkat <venkat.crescentian@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.14.0",
+    "http-server": "^0.9.0",
+    "nodemon": "^1.11.0"
+  }
+}
