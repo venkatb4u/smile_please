@@ -12,3 +12,9 @@ A js based lightweight library that can paint the current-state of look of the D
 1. Web
    - Include the lightweight lib script `smilePlease.js` using the cdn - https://raw.githubusercontent.com/venkatb4u/smile_please/master/example/smilePlease.js
    - smilePlease('#targetId', [optional-callback]);
+## Contribution
+Below are some possible `top priority` features/challenges yet to be addressed, and any sort of help from you is really appreciable.
+- Support for exporting various other image formats (png,gif etc.)
+- Appropriate/efficient way of painting `img` tags over `canvas`. 
+
+If anything else you feel can be included, pls feel free to raise it as an `issue` and provide a solution to it with a `pull request'.
