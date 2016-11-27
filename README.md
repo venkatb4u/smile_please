@@ -5,7 +5,7 @@
 - Do you have a physical/virtual canvas, for which the selected portion of web page should need to get painted?
 
 # Smile Please :) -- Here's the solution!
-------------------
+
 A js based lightweight library that can paint the current-state of look of the DOM you specify to a canvas -- eventually which in case it can be extracted as an image too.
 
 ## Usage
