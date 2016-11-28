@@ -43,39 +43,51 @@ var smilePlease = function (target, callback) {
 
 				document.body.appendChild(this.canvas);
 			},
-			
+
 			applyStyles: function () {
-				
+
 			},
 
 			cookBlob: function (domExtract) {
 				var xmlSer = new XMLSerializer();
 				var serialisedDom = xmlSer.serializeToString(domExtract);
-				var data = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
-					           '<foreignObject width="100%" height="100%">' +
-						           '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
-						            	serialisedDom +
-						           '</div>' +
-					           '</foreignObject>' +
-				           '</svg>';
-				var data1 ='<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
-					           '<foreignObject width="100%" height="100%">' +
-						           '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
-						             '<p style="color:red;"> hi venkat</p>' +
-						             '<div href="https://facebook.com" style="border:2px dotted yellow;"> div tag</div>' +
-						             '<img src="http://www.w3schools.com/tags/smiley.gif" width="50px" height="30px" />' +
-						           '</div>' +
-					           '</foreignObject>' +
-				           '</svg>';
-				console.log({data});
-				console.log({data1});
-				return data;
+
+				var svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" id="sp_svg">' +
+							           '<foreignObject width="100%" height="100%">' +
+								           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
+								           		serialisedDom +
+								           '</div>' +
+							           '</foreignObject>' +
+						          '</svg>';
+
+				// var xmlParser = new DOMParser();
+				// var xmlDoc = xmlParser.parseFromString(svgScaffold, "text/xml");
+				
+				// xmlDoc.getElementById('sp_root').appendChild(domExtract);
+
+				// var data = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
+				// 	           '<foreignObject width="100%" height="100%">' +
+				// 		           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
+				// 		            	serialisedDom +
+				// 		           '</div>' +
+				// 	           '</foreignObject>' +
+				//            '</svg>';
+			
+				// var xmlSer = new XMLSerializer();
+				// var serialisedDom = xmlSer.serializeToString(xmlDoc);
+				
+				// console.log({xmlDoc});
+				// console.log({data1});
+				// return xmlSer.serializeToString(xmlDoc.getElementById('sp_svg'));
+				return svgScaffold;
 			},
 
 			render: function () {
 				var self = this;
 				var img = new Image();
-				var svg = new Blob([this.cookBlob(this.target)], {type: 'image/svg+xml'});
+				var cookedBlob = this.cookBlob(this.target);
+				console.log(cookedBlob);
+				var svg = new Blob([cookedBlob], {type: 'image/svg+xml'});
 				var url = DOMURL.createObjectURL(svg);
 
 				img.onload = function () {
