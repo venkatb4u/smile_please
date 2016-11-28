@@ -10,7 +10,10 @@
  /*
   USAGE:
   -----
-	smilePlease(dom, [optional callback]); (or) __(dom, [optional callback]);
+    *  __(); (OR) smilePlease();   // if no DOM specified, 'document.body' is made to be default
+
+	*  __(dom, [optional callback]); (OR) smilePlease(dom, [optional callback]);
+	  e.g. __('#test'), __('.test', function(canvas) { document.body.appendChild(canvas) })
  */
 
 var smilePlease = function (target, callback) {
@@ -22,11 +25,12 @@ var smilePlease = function (target, callback) {
 
 		function sp () {
 			(function init(sp) {
-				sp.target = tg;
+				// target assignment, if not, doc.body is default
+				sp.target = tg || document.body;
 				sp.cb = cb;
 
 				// cloning the target to avoid polluting the original doc reference
-				sp.targetClone = tg.cloneNode(true); 
+				sp.targetClone = sp.target.cloneNode(true); 
 
 				sp.createCanvas(); 
 				sp.render();
@@ -50,6 +54,7 @@ var smilePlease = function (target, callback) {
 				}
 				var len = cs.length || 0;
 				var inlStyles = "";
+
 				while (len--) {
 				 
 				  var style = cs[len];
@@ -148,7 +153,7 @@ var smilePlease = function (target, callback) {
 
 __ = smilePlease; // short-hand alias.
 
-// e.g. 
+// DEBUG mode
 __('#test', function(canvas) {
 	document.body.appendChild(canvas);
 });
