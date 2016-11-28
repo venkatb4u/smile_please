@@ -14,11 +14,7 @@
  */
 
 var smilePlease = function (target, callback) {
-	// function targetResolve (target) {
-	// 	if (typeof target === 'string') {
-
-	// 	}
-	// }
+	
 	(function (tg, cb) {
 	 	"use strict";
 
@@ -27,22 +23,27 @@ var smilePlease = function (target, callback) {
 		function sp () {
 			(function init(sp) {
 				sp.target = tg;
-				sp.createCanvas(); 
+
+				// cloning the target to avoid polluting the original reference
+				sp.targetClone = tg.cloneNode(true); 
+
+				// sp.createCanvas(); 
 				sp.render();
-				sp.applyStyles();
+				// sp.applyStyles();
 			})(this);
 		};
 
 		sp.prototype = {
 
 			createCanvas: function () {
-				var canvas = document.createElement('canvas');
+				// var canvas = document.createElement('canvas');
+				var canvas = document.getElementById('canvas');
 				canvas.setAttribute('width', this.target.offsetWidth + 'px');
 				canvas.setAttribute('height', this.target.offsetHeight + 'px');
 				this.canvas = canvas;
 				this.ctx = canvas.getContext('2d');
 
-				document.body.appendChild(this.canvas);
+				
 			},
 
 			getStyles: function (elem, prop) {
@@ -62,19 +63,26 @@ var smilePlease = function (target, callback) {
 				return inlStyles;
 			},
 
-			applyStyles: function () {
-				var nodeList = this.target.getElementsByTagName('*'),
+			applyStyles: function (target) {
+				var nodeList = target ? target.getElementsByTagName('*') : this.target.getElementsByTagName('*'),
 					nodeListLen = nodeList.length;
+				var nodeCloneList = this.targetClone.getElementsByTagName('*');
+
 				for (var i=0; i<nodeListLen; i++) {
-					var tag = nodeList[i];
-					tag.style = this.getStyles(tag);
+					nodeCloneList[i].style = this.getStyles(nodeList[i]);
 				}
-				return nodeList;
+				this.targetClone.style = this.getStyles(this.target); // target tag style apply
+				
+				return nodeCloneList;
 			},
 
-			cookBlob: function (domExtract) {
+			cookBlob: function (target) {
+				var target = target || this.targetClone;
+				
+				this.applyStyles();
+
 				var xmlSer = new XMLSerializer();
-				var serialisedDom = xmlSer.serializeToString(domExtract);
+				var serialisedDom = xmlSer.serializeToString(target);
 
 				var svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" id="sp_svg">' +
 							           '<foreignObject width="100%" height="100%">' +
@@ -83,43 +91,44 @@ var smilePlease = function (target, callback) {
 								           '</div>' +
 							           '</foreignObject>' +
 						          '</svg>';
-
+			    // console.log(serialisedDom);
 				// var xmlParser = new DOMParser();
 				// var xmlDoc = xmlParser.parseFromString(svgScaffold, "text/xml");
 				
 				// xmlDoc.getElementById('sp_root').appendChild(domExtract);
-
-				// var data = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
-				// 	           '<foreignObject width="100%" height="100%">' +
-				// 		           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
-				// 		            	serialisedDom +
-				// 		           '</div>' +
-				// 	           '</foreignObject>' +
-				//            '</svg>';
-			
-				// var xmlSer = new XMLSerializer();
-				// var serialisedDom = xmlSer.serializeToString(xmlDoc);
-				
-				// console.log({xmlDoc});
-				// console.log({data1});
-				// return xmlSer.serializeToString(xmlDoc.getElementById('sp_svg'));
 				return svgScaffold;
 			},
 
 			render: function () {
 				var self = this;
 				var img = new Image();
-				var cookedBlob = this.cookBlob(this.target);
+				var cookedBlob = this.cookBlob();
 				// console.log(cookedBlob);
 				var svg = new Blob([cookedBlob], {type: 'image/svg+xml'});
 				var url = DOMURL.createObjectURL(svg);
 
-				img.onload = function () {
-				  self.ctx.drawImage(img, 0, 0);
-				  DOMURL.revokeObjectURL(url);
-				}
+				this.createCanvas();
 
 				img.src = url;
+				img.setAttribute('width', this.canvas.width + 'px');
+				img.setAttribute('height', this.canvas.height + 'px');
+
+				img.onload = function () {
+					var imgWidth = img.width;
+					var imgHeight = img.height;
+
+					self.canvas.width = imgWidth;
+					self.canvas.height = imgHeight;
+
+				  	// self.ctx.drawImage(img, 0, 0, 500, 300, 0, 0, 500, 300);
+				  	self.ctx.drawImage(img, 0, 0);
+				  	DOMURL.revokeObjectURL(url);
+				}
+
+				
+
+				// document.body.appendChild(img);
+				document.body.appendChild(this.canvas);
 
 			}
 
