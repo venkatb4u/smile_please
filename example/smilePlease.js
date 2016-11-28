@@ -155,5 +155,6 @@ var smilePlease = function (target, callback) {
 
 __ = smilePlease; // short-hand alias.
 
+// e.g. 
 __('#test');
 
