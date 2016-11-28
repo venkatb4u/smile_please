@@ -10,7 +10,7 @@
  /*
   USAGE:
   -----
-	smilePlease(dom, [optional callback]);
+	smilePlease(dom, [optional callback]); (or) __(dom, [optional callback]);
  */
 
 var smilePlease = function (target, callback) {
@@ -24,32 +24,27 @@ var smilePlease = function (target, callback) {
 			(function init(sp) {
 				sp.target = tg;
 
-				// cloning the target to avoid polluting the original reference
+				// cloning the target to avoid polluting the original doc reference
 				sp.targetClone = tg.cloneNode(true); 
 
 				sp.createCanvas(); 
 				sp.render();
-				// sp.applyStyles();
 			})(this);
 		};
 
 		sp.prototype = {
 
 			createCanvas: function () {
-				// var canvas = document.createElement('canvas');
-				var canvas = document.getElementById('canvas');
+				var canvas = document.createElement('canvas');
 				canvas.setAttribute('width', this.target.offsetWidth + 'px');
 				canvas.setAttribute('height', this.target.offsetHeight + 'px');
 				this.canvas = canvas;
 				this.ctx = canvas.getContext('2d');
-
-				
 			},
 
 			getStyles: function (elem, isRoot, prop) {
 				var cs = window.getComputedStyle(elem,null);
 			  	if (prop) {
-				  // console.log(prop+" : "+cs.getPropertyValue(prop));
 				  return prop + ":" + cs.getPropertyValue(prop) + ";";
 				}
 				var len = cs.length || 0;
@@ -64,7 +59,6 @@ var smilePlease = function (target, callback) {
 				  }
 
 				  inlStyles += (style + ":" + cs.getPropertyValue(style) + ";");
-				  // console.log(style+" : "+cs.getPropertyValue(style));
 				}
 				return inlStyles;
 			},
@@ -114,11 +108,10 @@ var smilePlease = function (target, callback) {
 				var self = this;
 				var img = new Image();
 				var cookedBlob = this.cookBlob();
-				// console.log(cookedBlob);
+
 				var svg = new Blob([cookedBlob], {type: 'image/svg+xml'});
 				var url = DOMURL.createObjectURL(svg);
 
-				// this.createCanvas();
 
 				img.src = url;
 				img.setAttribute('width', this.canvas.width + 'px');
@@ -136,8 +129,6 @@ var smilePlease = function (target, callback) {
 				  	// document.body.appendChild(img);
 				  	DOMURL.revokeObjectURL(url);
 				}
-
-				
 
 				// document.body.appendChild(img);
 				document.body.appendChild(this.canvas);
