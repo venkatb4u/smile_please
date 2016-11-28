@@ -110,16 +110,14 @@ var smilePlease = function (target, callback) {
 
 			render: function () {
 				var self = this;
-				var img = new Image();
 				var cookedBlob = this.cookBlob();
 
 				var svg = new Blob([cookedBlob], {type: 'image/svg+xml'});
 				var url = DOMURL.createObjectURL(svg);
 
-
-				img.src = url;
-				img.setAttribute('width', this.canvas.width + 'px');
-				img.setAttribute('height', this.canvas.height + 'px');
+				var img = new Image();
+				// img.crossOrigin = "anonymous";
+				
 
 				img.onload = function () {
 					var imgWidth = img.width;
@@ -130,6 +128,18 @@ var smilePlease = function (target, callback) {
 
 				  	// self.ctx.drawImage(img, 0, 0, 500, 300, 0, 0, 500, 300);
 				  	self.ctx.drawImage(img, 0, 0);
+
+				  	try { // handling exception if canvas is tainted
+				  		var dataURL = self.canvas.toDataURL("image/png", 1.0);
+    					dataURL.replace(/^data:image\/(png|jpg);base64,/, ""); 	
+				  	}
+				  	catch (e) {
+				  		console.log(e);
+				  	}
+				  	
+
+				  	dataURL && localStorage.setItem("savedImageData", dataURL);
+
 				  	// document.body.appendChild(img);
 				  	DOMURL.revokeObjectURL(url);
 
@@ -137,8 +147,20 @@ var smilePlease = function (target, callback) {
 				  	self.cb && self.cb(self.canvas); 
 				}
 
+				img.setAttribute('crossOrigin', 'anonymous'); // this is to support CORS
+				img.setAttribute('width', this.canvas.width + 'px');
+				img.setAttribute('height', this.canvas.height + 'px');
+				img.src = url;
+				// img.src = "http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG";
+
+				// make sure the load event fires for cached images too
+				if ( img.complete || img.complete === undefined ) {
+				    img.src = "blob:http://localhost:3000/14d9bc95-e312-4872-8ab3-282e97c1dd0b";
+				    img.src = url;
+				}
+
 				// document.body.appendChild(img);
-				document.body.appendChild(this.canvas);
+				// document.body.appendChild(this.canvas);
 
 			}
 
@@ -156,5 +178,6 @@ __ = smilePlease; // short-hand alias.
 // DEBUG mode
 __('#test', function(canvas) {
 	document.body.appendChild(canvas);
+	// console.log(canvas.toDataURL('image/jpeg', 1.0));
 });
 
