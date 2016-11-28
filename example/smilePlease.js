@@ -23,6 +23,7 @@ var smilePlease = function (target, callback) {
 		function sp () {
 			(function init(sp) {
 				sp.target = tg;
+				sp.cb = cb;
 
 				// cloning the target to avoid polluting the original doc reference
 				sp.targetClone = tg.cloneNode(true); 
@@ -54,9 +55,8 @@ var smilePlease = function (target, callback) {
 				  var style = cs[len];
 
 				  // skipping to add 'margins' to the canvas for Root elem
-				  if (isRoot && (style.indexOf('margin') > -1 || style.indexOf('margin-') > -1)) {
+				  if (isRoot && (style.indexOf('margin') > -1 || style.indexOf('margin-') > -1))
 				  	  continue;
-				  }
 
 				  inlStyles += (style + ":" + cs.getPropertyValue(style) + ";");
 				}
@@ -69,9 +69,8 @@ var smilePlease = function (target, callback) {
 					nodeListLen = nodeList.length || 0;
 				var nodeCloneList = this.targetClone.getElementsByTagName('*');
 
-				while (--nodeListLen) {
+				while (--nodeListLen) 
 					nodeCloneList[nodeListLen].style = this.getStyles(nodeList[nodeListLen]);
-				}
 
 				(function rootNodeStyleFix (sp) { // target tag style apply		
 					sp.targetClone.style = sp.getStyles(sp.target, true); 
@@ -128,6 +127,9 @@ var smilePlease = function (target, callback) {
 				  	self.ctx.drawImage(img, 0, 0);
 				  	// document.body.appendChild(img);
 				  	DOMURL.revokeObjectURL(url);
+
+				  	// callback trigger
+				  	self.cb && self.cb(self.canvas); 
 				}
 
 				// document.body.appendChild(img);
@@ -147,5 +149,7 @@ var smilePlease = function (target, callback) {
 __ = smilePlease; // short-hand alias.
 
 // e.g. 
-__('#test');
+__('#test', function(canvas) {
+	document.body.appendChild(canvas);
+});
 
