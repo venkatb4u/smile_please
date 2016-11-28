@@ -84,7 +84,7 @@ var smilePlease = function (target, callback) {
 				var xmlSer = new XMLSerializer();
 				var serialisedDom = xmlSer.serializeToString(target);
 
-				var svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" id="sp_svg">' +
+				var svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" id="sp_svg">' +
 							           '<foreignObject width="100%" height="100%">' +
 								           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
 								           		serialisedDom +
@@ -122,6 +122,7 @@ var smilePlease = function (target, callback) {
 
 				  	// self.ctx.drawImage(img, 0, 0, 500, 300, 0, 0, 500, 300);
 				  	self.ctx.drawImage(img, 0, 0);
+				  	// document.body.appendChild(img);
 				  	DOMURL.revokeObjectURL(url);
 				}
 
