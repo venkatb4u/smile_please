@@ -1,7 +1,7 @@
 
 /*
  * SmilePlease v1.0 - a lightweight library for taking screenshots of the current state of DOM
- * Author: Venkat Subramanian (https://github.com/Venkatb4U)
+ * Author: Venkat Subramanian <venkat.crescentian@gmail.com>
  * 
  * Copyright (c) 2016 Venkat Subramanian (https://github.com/Venkatb4U)
  * Licence: MIT
@@ -81,8 +81,6 @@ var smilePlease = function (target, callback) {
 
 				(function rootNodeStyleFix (sp) { // target tag style apply		
 					sp.targetClone.style = sp.getStyles(sp.target, true); 
-					// sp.targetClone.style +=
-
 				})(this);
 				
 				
