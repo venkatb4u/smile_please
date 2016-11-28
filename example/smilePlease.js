@@ -27,7 +27,7 @@ var smilePlease = function (target, callback) {
 				// cloning the target to avoid polluting the original reference
 				sp.targetClone = tg.cloneNode(true); 
 
-				// sp.createCanvas(); 
+				sp.createCanvas(); 
 				sp.render();
 				// sp.applyStyles();
 			})(this);
@@ -46,17 +46,23 @@ var smilePlease = function (target, callback) {
 				
 			},
 
-			getStyles: function (elem, prop) {
+			getStyles: function (elem, isRoot, prop) {
 				var cs = window.getComputedStyle(elem,null);
 			  	if (prop) {
 				  // console.log(prop+" : "+cs.getPropertyValue(prop));
 				  return prop + ":" + cs.getPropertyValue(prop) + ";";
 				}
-				var len = cs.length;
+				var len = cs.length || 0;
 				var inlStyles = "";
-				for (var i=0;i<len;i++) {
+				while (--len) {
 				 
-				  var style = cs[i];
+				  var style = cs[len];
+
+				  // skipping to add 'margins' to the canvas for Root elem
+				  if (isRoot && (style.indexOf('margin') > -1 || style.indexOf('margin-') > -1)) {
+				  	  continue;
+				  }
+
 				  inlStyles += (style + ":" + cs.getPropertyValue(style) + ";");
 				  // console.log(style+" : "+cs.getPropertyValue(style));
 				}
@@ -64,14 +70,21 @@ var smilePlease = function (target, callback) {
 			},
 
 			applyStyles: function (target) {
+				
 				var nodeList = target ? target.getElementsByTagName('*') : this.target.getElementsByTagName('*'),
-					nodeListLen = nodeList.length;
+					nodeListLen = nodeList.length || 0;
 				var nodeCloneList = this.targetClone.getElementsByTagName('*');
 
-				for (var i=0; i<nodeListLen; i++) {
-					nodeCloneList[i].style = this.getStyles(nodeList[i]);
+				while (--nodeListLen) {
+					nodeCloneList[nodeListLen].style = this.getStyles(nodeList[nodeListLen]);
 				}
-				this.targetClone.style = this.getStyles(this.target); // target tag style apply
+
+				(function rootNodeStyleFix (sp) { // target tag style apply		
+					sp.targetClone.style = sp.getStyles(sp.target, true); 
+					// sp.targetClone.style +=
+
+				})(this);
+				
 				
 				return nodeCloneList;
 			},
@@ -107,7 +120,7 @@ var smilePlease = function (target, callback) {
 				var svg = new Blob([cookedBlob], {type: 'image/svg+xml'});
 				var url = DOMURL.createObjectURL(svg);
 
-				this.createCanvas();
+				// this.createCanvas();
 
 				img.src = url;
 				img.setAttribute('width', this.canvas.width + 'px');
