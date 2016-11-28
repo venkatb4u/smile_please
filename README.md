@@ -13,7 +13,9 @@ A js based lightweight library that can paint the current-state of look of the D
    - Include the lightweight lib script `smilePlease.js` using the cdn - https://raw.githubusercontent.com/venkatb4u/smile_please/master/example/smilePlease.js
    
    usage 1:  `__();` (OR) `smilePlease();`   // if no DOM specified, 'document.body' is made to be default.
+   
    usage 2:  `__(dom, [optional-callback]);` (OR) `smilePlease(dom, [optional-callback]);`
+   
    e.g.:  `__('#test')`, `__('.test', function(canvas) { document.body.appendChild(canvas) });`
  
 ## Contribution
