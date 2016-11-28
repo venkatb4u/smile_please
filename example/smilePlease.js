@@ -50,7 +50,7 @@ var smilePlease = function (target, callback) {
 				}
 				var len = cs.length || 0;
 				var inlStyles = "";
-				while (--len) {
+				while (len--) {
 				 
 				  var style = cs[len];
 
@@ -69,7 +69,7 @@ var smilePlease = function (target, callback) {
 					nodeListLen = nodeList.length || 0;
 				var nodeCloneList = this.targetClone.getElementsByTagName('*');
 
-				while (--nodeListLen) 
+				while (nodeListLen--) 
 					nodeCloneList[nodeListLen].style = this.getStyles(nodeList[nodeListLen]);
 
 				(function rootNodeStyleFix (sp) { // target tag style apply		
