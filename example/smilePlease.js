@@ -29,6 +29,7 @@ var smilePlease = function (target, callback) {
 				sp.target = tg;
 				sp.createCanvas(); 
 				sp.render();
+				sp.applyStyles();
 			})(this);
 		};
 
@@ -44,8 +45,31 @@ var smilePlease = function (target, callback) {
 				document.body.appendChild(this.canvas);
 			},
 
-			applyStyles: function () {
+			getStyles: function (elem, prop) {
+				var cs = window.getComputedStyle(elem,null);
+			  	if (prop) {
+				  // console.log(prop+" : "+cs.getPropertyValue(prop));
+				  return prop + ":" + cs.getPropertyValue(prop) + ";";
+				}
+				var len = cs.length;
+				var inlStyles = "";
+				for (var i=0;i<len;i++) {
+				 
+				  var style = cs[i];
+				  inlStyles += (style + ":" + cs.getPropertyValue(style) + ";");
+				  // console.log(style+" : "+cs.getPropertyValue(style));
+				}
+				return inlStyles;
+			},
 
+			applyStyles: function () {
+				var nodeList = this.target.getElementsByTagName('*'),
+					nodeListLen = nodeList.length;
+				for (var i=0; i<nodeListLen; i++) {
+					var tag = nodeList[i];
+					tag.style = this.getStyles(tag);
+				}
+				return nodeList;
 			},
 
 			cookBlob: function (domExtract) {
@@ -86,7 +110,7 @@ var smilePlease = function (target, callback) {
 				var self = this;
 				var img = new Image();
 				var cookedBlob = this.cookBlob(this.target);
-				console.log(cookedBlob);
+				// console.log(cookedBlob);
 				var svg = new Blob([cookedBlob], {type: 'image/svg+xml'});
 				var url = DOMURL.createObjectURL(svg);
 
