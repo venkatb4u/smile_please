@@ -14,7 +14,8 @@
 
 	*  __(dom, [optional-callback]); (OR) smilePlease(dom, [optional -allback]);
 	  e.g. __('#test'), __('.test', function(canvas) { document.body.appendChild(canvas) })
-	* Simply double-click on the page to toggle the 'EDIT' mode and single click to select the DOM
+
+	* Simply double-click on the page to toggle the 'EDIT' mode GUI and single click to select the DOM
  */
 
 var SP = (function () {
@@ -27,7 +28,7 @@ var SP = (function () {
 	 	var DOMURL = window.URL || window.webkitURL || window;
 
 		function sp () {
-			(function init(sp, editModeTrigger) {
+			(function init(sp) {
 				// target assignment, if not, doc.body is default
 				sp.target = tg || document.body;
 				sp.cb = cb;
@@ -37,14 +38,9 @@ var SP = (function () {
 
 				sp.createCanvas(); 
 
-				sp.render(function() {
-					document.body.addEventListener('dblclick', editModeTrigger);
-				});
+				sp.render();
 
-
-			})(this, function() {
-				
-			});
+			})(this);
 
 			return {
 				start : this.guiStart,
@@ -68,11 +64,10 @@ var SP = (function () {
 			  	if (prop) {
 				  return prop + ":" + cs.getPropertyValue(prop) + ";";
 				}
-				var len = cs.length || 0;
-				var inlStyles = "";
+				var len = cs.length || 0,
+					inlStyles = "";
 
 				while (len--) {
-				 
 				  var style = cs[len];
 
 				  // skipping to add 'margins' to the canvas for Root elem
@@ -105,31 +100,29 @@ var SP = (function () {
 				
 				this.applyStyles();
 
-				var xmlSer = new XMLSerializer();
-				var serialisedDom = xmlSer.serializeToString(target);
+				var xmlSer = new XMLSerializer(),
+					serialisedDom = xmlSer.serializeToString(target),
+					svgScaffold = '';
 
-				var svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" id="sp_svg">' +
-							           '<foreignObject width="100%" height="100%">' +
-								           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
-								           		serialisedDom +
-								           '</div>' +
-							           '</foreignObject>' +
-						          '</svg>';
-				return svgScaffold;
+				return svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" id="sp_svg">' +
+								           '<foreignObject width="100%" height="100%">' +
+									           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
+									           		serialisedDom +
+									           '</div>' +
+								           '</foreignObject>' +
+							          '</svg>';
 			},
 
 			render: function () {
-				var self = this;
-				var cookedBlob = this.cookBlob();
-
-				var svg = new Blob([cookedBlob], {type: 'image/svg+xml'});
-				var url = DOMURL.createObjectURL(svg);
-
-				var img = new Image();
+				var self = this,
+					cookedBlob = this.cookBlob(),
+					svg = new Blob([cookedBlob], {type: 'image/svg+xml'}),
+					url = DOMURL.createObjectURL(svg),
+					img = new Image();
 
 				img.onload = function () {
-					var imgWidth = img.width;
-					var imgHeight = img.height;
+					var imgWidth = img.width,
+						imgHeight = img.height;
 
 					self.canvas.width = imgWidth;
 					self.canvas.height = imgHeight;
@@ -159,15 +152,13 @@ var SP = (function () {
 				img.setAttribute('width', this.canvas.width + 'px');
 				img.setAttribute('height', this.canvas.height + 'px');
 				img.src = url;
-				// img.src = "http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG";
 
 				// make sure the load event fires for cached images too
 				if ( img.complete || img.complete === undefined ) {
-				    img.src = "blob:http://localhost:3000/14d9bc95-e312-4872-8ab3-282e97c1dd0b";
+				    img.src = "http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG";
 				    img.src = url;
 				}
 
-				// document.body.appendChild(img);
 				var modal = document.getElementById('sp_modal');
 				while (modal.firstChild)  // flushing off
 				    modal.removeChild(modal.firstChild);
@@ -176,7 +167,7 @@ var SP = (function () {
 				header.textContent = "Here's the screenshot...! \n Do 'Right click' --> 'Save As' to export it out.";
 				modal.appendChild(header);
 				modal.appendChild(this.canvas);
-				modal.showModal();
+				!modal.hasAttribute('open') && modal.showModal();
 
 			}
 
@@ -186,6 +177,7 @@ var SP = (function () {
 
 	}
 
+	// Event handlers
 	function selectHandler (e) {
 		e.preventDefault(); // cutting-off default behaviours 
 		e.stopPropagation(); // to prevent propagating to dblclick
@@ -208,13 +200,35 @@ var SP = (function () {
 	}
 	document.body.addEventListener('dblclick', editModeHandler, false);
 
+	// Styles
+	(function attachSpStyles () {
+		
+		var style = ".sp_edit *:hover {"
+						+ "cursor: move;"
+						+ "box-shadow: -1px 3px 21px 0px rgba(0, 0, 0, 0.75);"
+					+ "}"
+					+ "#sp_modal {"
+						+ "text-align: center;"
+						+ "width: 90%;"
+						+ "margin: 0 auto;"
+						+ "padding: 0 0 20px 0;"
+					+ "}"
+					+ "#sp_modal > header {"
+						+ "padding: 15px;"
+						+ "margin-bottom: 20px;"
+						+ "background: #f7f9fb;"
+						+ "box-shadow: 0px 1px 10px #333;"
+					+ "}";
+		var styleTag = document.createElement('style');
+		styleTag.textContent = style;
+		document.head.appendChild(styleTag);
+	})();
+	// Modal
 	(function modalScreen () {
 		var modal = document.createElement('dialog');
 		modal.id = 'sp_modal';
 		document.body.appendChild(modal);
 	})();
-
-	// modalScreen();
 
 	console.log('EditMode events triggered...!');
 	console.log('Use __(dom, [optional-callback]) for taking screengrabs');

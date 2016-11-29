@@ -33,7 +33,7 @@
 					"last 1 version", "> 1%", "ie 8", "ie 7"
 					))
 				// .pipe(gulp.dest(dest + '/css'))
-				.pipe(minifycss())
+				// .pipe(minifycss())
 				.pipe(gulp.dest(dest + '/css'));
 		});
 
