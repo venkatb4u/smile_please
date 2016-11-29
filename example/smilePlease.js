@@ -36,7 +36,7 @@ var smilePlease = function (target, callback) {
 				sp.render();
 			})(this);
 		};
-
+	
 		sp.prototype = {
 
 			createCanvas: function () {

@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "DEBUG=* nodemon ./example/server.js",
     "watch": "DEBUG=* nodemon -e js,sjs,css  ./server.js",
+    "build": "gulp",
     "deploy": "cd ./example && http-server"
   },
   "repository": {
@@ -19,5 +20,15 @@
     "express": "^4.14.0",
     "http-server": "^0.9.0",
     "nodemon": "^1.11.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-imagemin": "^3.1.1",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-sass": "^2.3.2",
+    "gulp-size": "^2.1.0",
+    "gulp-svgmin": "^1.2.3",
+    "gulp-uglify": "^2.0.0"
   }
 }
