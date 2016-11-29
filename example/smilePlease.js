@@ -14,6 +14,7 @@
 
 	*  __(dom, [optional-callback]); (OR) smilePlease(dom, [optional -allback]);
 	  e.g. __('#test'), __('.test', function(canvas) { document.body.appendChild(canvas) })
+	* Simply double-click on the page to toggle the 'EDIT' mode and single click to select the DOM
  */
 
 var SP = (function () {
@@ -168,6 +169,9 @@ var SP = (function () {
 
 				// document.body.appendChild(img);
 				var modal = document.getElementById('sp_modal');
+				while (modal.firstChild)  // flushing off
+				    modal.removeChild(modal.firstChild);
+
 				var header = document.createElement('header');
 				header.textContent = "Here's the screenshot...! \n Do 'Right click' --> 'Save As' to export it out.";
 				modal.appendChild(header);
@@ -187,37 +191,30 @@ var SP = (function () {
 		e.stopPropagation(); // to prevent propagating to dblclick
 
 		this.selected = e.target;
-		console.log(this.selected);
+		console.log("Selected - ", this.selected);
 
-		_(this.selected);
-
-		document.body.classList.remove('sp_edit');
-		document.body.removeEventListener('click', selectHandler, true); // ONE-TIME event trigger
+		_(this.selected, function() {
+			document.body.classList.remove('sp_edit');
+			document.body.removeEventListener('click', selectHandler, true); // ONE-TIME event trigger
+		});
+		
 	}
 	
 	function editModeHandler (e) {
 		e.preventDefault();
 		e.stopPropagation();
 
-		if(document.body.classList.toggle('sp_edit')) { // if added
-			document.body.addEventListener('click', selectHandler, true);
-		}
-		else {
-			document.body.removeEventListener('click', selectHandler, true);
-		}
+		document.body.classList.toggle('sp_edit') ? document.body.addEventListener('click', selectHandler, true) : document.body.removeEventListener('click', selectHandler, true);
 	}
+	document.body.addEventListener('dblclick', editModeHandler, false);
 
-	function modalScreen () {
+	(function modalScreen () {
 		var modal = document.createElement('dialog');
 		modal.id = 'sp_modal';
-		var header = document.createElement('header');
-		header.textContent = "Here's the screenshot...! \n Do 'Right click' --> 'Save As' to export it out.";
-		modal.appendChild(header);
 		document.body.appendChild(modal);
-	}
+	})();
 
-	document.body.addEventListener('dblclick', editModeHandler, false);
-	modalScreen();
+	// modalScreen();
 
 	console.log('EditMode events triggered...!');
 	console.log('Use __(dom, [optional-callback]) for taking screengrabs');
