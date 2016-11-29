@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "DEBUG=* nodemon ./example/server.js",
     "watch": "DEBUG=* nodemon -e js,sjs,css  ./server.js",
-    "build": "gulp",
+    "build": "gulp watch",
     "deploy": "cd ./example && http-server"
   },
   "repository": {

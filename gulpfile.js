@@ -60,15 +60,14 @@
 		});
 
 //
+	gulp.task('default', ['sass', 'uglify', 'imagemin']);
 
-	gulp.task('default', function(){
+	gulp.task('watch', ['default'], function() {
 
 		// watch me getting Sassy
-		gulp.watch(src + "/assets/styles/*.scss", function(event){
-			gulp.run('sass');
-		});
+		gulp.watch(src + "/assets/styles/*.scss", ["sass"]);
 		// make my JavaScript ugly
-		gulp.watch(src + "/smilePlease.js", [uglify]);
+		gulp.watch(src + "/smilePlease.js", ["uglify"]);
 		// images
-		gulp.watch(src + "/assets/img/**/*", [imagemin]);
+		gulp.watch(src + "/assets/img/**/*", ["imagemin"]);
 	});
