@@ -185,10 +185,18 @@ var SP = (function () {
 		this.selected = e.target;
 		console.log("Selected - ", this.selected);
 
-		_(this.selected, function() {
-			document.body.classList.remove('sp_edit');
-			document.body.removeEventListener('click', selectHandler, true); // ONE-TIME event trigger
-		});
+		var modal = document.getElementById('sp_modal');
+		if (modal.hasAttribute('open') && modal.contains(document.getElementsByTagName('canvas')[0])) {
+			modal.removeChild(modal.lastChild);
+			modal.close();
+		}
+		else {
+			_(this.selected, function() {
+				document.body.classList.remove('sp_edit');
+				document.body.removeEventListener('click', selectHandler, true); // ONE-TIME event trigger
+			});
+		}
+		
 		
 	}
 	
@@ -202,7 +210,7 @@ var SP = (function () {
 
 	// Styles
 	(function attachSpStyles () {
-		
+
 		var style = ".sp_edit *:hover {"
 						+ "cursor: move;"
 						+ "box-shadow: -1px 3px 21px 0px rgba(0, 0, 0, 0.75);"
