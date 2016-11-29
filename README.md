@@ -17,6 +17,8 @@ A js based lightweight library that can paint the current-state of look of the D
    usage 2:  `__(dom, [optional-callback]);` (OR) `smilePlease(dom, [optional-callback]);`
    
    e.g.:  `__('#test')`, `__('.test', function(canvas) { document.body.appendChild(canvas) });`
+   
+   usage 3: Simply double-click on the page to toggle the 'EDIT' mode and single click to select the DOM
  
 ## Contribution
 Below are some possible `top priority` features/challenges yet to be addressed, and any sort of help from you is really appreciable.
