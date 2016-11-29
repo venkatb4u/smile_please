@@ -12,19 +12,52 @@
   -----
     *  __(); (OR) smilePlease();   // if no DOM specified, 'document.body' is made to be default
 
-	*  __(dom, [optional callback]); (OR) smilePlease(dom, [optional callback]);
+	*  __(dom, [optional-callback]); (OR) smilePlease(dom, [optional -allback]);
 	  e.g. __('#test'), __('.test', function(canvas) { document.body.appendChild(canvas) })
  */
 
-var smilePlease = function (target, callback) {
+var SP = (function () {
+	"use strict";
+	function selectHandler (e) {
+		e.preventDefault(); // cutting-off default behaviours 
+		e.stopPropagation(); // to prevent propagating to dblclick
+
+		this.selected = e.target;
+		console.log(this.selected);
+	}
 	
-	(function (tg, cb) {
-	 	"use strict";
+	function editModeHandler (e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if(document.body.classList.toggle('sp_edit')) { // if added
+			document.body.addEventListener('click', selectHandler, true);
+		}
+		else {
+			document.body.removeEventListener('click', selectHandler, true);
+		}
+	}
+
+	function modalScreen () {
+		var modal = document.createElement('dialog');
+		modal.id = 'sp_modal';
+		document.body.appendChild(modal);
+	}
+
+	document.body.addEventListener('dblclick', editModeHandler, false);
+	modalScreen();
+
+	console.log('EditMode events triggered...!');
+	console.log('Use __(dom, [optional-callback]) for taking screengrabs');
+
+	return function (tg, cb) {
+
+	 	tg = typeof tg === 'string' ? document.querySelector(tg) : tg;
 
 	 	var DOMURL = window.URL || window.webkitURL || window;
 
 		function sp () {
-			(function init(sp) {
+			(function init(sp, editModeTrigger) {
 				// target assignment, if not, doc.body is default
 				sp.target = tg || document.body;
 				sp.cb = cb;
@@ -33,10 +66,23 @@ var smilePlease = function (target, callback) {
 				sp.targetClone = sp.target.cloneNode(true); 
 
 				sp.createCanvas(); 
-				sp.render();
-			})(this);
+
+				sp.render(function() {
+					document.body.addEventListener('dblclick', editModeTrigger);
+				});
+
+
+			})(this, function() {
+				
+			});
+
+			return {
+				start : this.guiStart,
+				stop : this.guiStop,
+				__proto__ : this.__proto__
+			}
 		};
-	
+
 		sp.prototype = {
 
 			createCanvas: function () {
@@ -81,7 +127,6 @@ var smilePlease = function (target, callback) {
 					sp.targetClone.style = sp.getStyles(sp.target, true); 
 				})(this);
 				
-				
 				return nodeCloneList;
 			},
 
@@ -100,11 +145,6 @@ var smilePlease = function (target, callback) {
 								           '</div>' +
 							           '</foreignObject>' +
 						          '</svg>';
-			    // console.log(serialisedDom);
-				// var xmlParser = new DOMParser();
-				// var xmlDoc = xmlParser.parseFromString(svgScaffold, "text/xml");
-				
-				// xmlDoc.getElementById('sp_root').appendChild(domExtract);
 				return svgScaffold;
 			},
 
@@ -116,8 +156,6 @@ var smilePlease = function (target, callback) {
 				var url = DOMURL.createObjectURL(svg);
 
 				var img = new Image();
-				// img.crossOrigin = "anonymous";
-				
 
 				img.onload = function () {
 					var imgWidth = img.width;
@@ -160,7 +198,9 @@ var smilePlease = function (target, callback) {
 				}
 
 				// document.body.appendChild(img);
-				// document.body.appendChild(this.canvas);
+				var modal = document.getElementById('sp_modal');
+				modal.appendChild(this.canvas);
+				modal.showModal();
 
 			}
 
@@ -168,16 +208,15 @@ var smilePlease = function (target, callback) {
 
 		return new sp();
 
-	}(function(target) {
-		return typeof target === 'string' ? document.querySelector(target) : target;
-	}(target), callback));
-}
+	};
 
-__ = smilePlease; // short-hand alias.
+})();
+
+__ = smilePlease = SP; // short-hand alias.
 
 // DEBUG mode
-__('#test', function(canvas) {
-	document.body.appendChild(canvas);
-	// console.log(canvas.toDataURL('image/jpeg', 1.0));
-});
+// __('#test', function(canvas) {
+// 	document.body.appendChild(canvas);
+// 	// console.log(canvas.toDataURL('image/jpeg', 1.0));
+// });
 

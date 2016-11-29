@@ -52,7 +52,18 @@
 			font-weight: bold;
 			margin-right: 10px;
 			color: green;
-			font:1;
 		}
 	}
+}
+
+.sp_edit *:hover {
+	cursor: move;
+	-webkit-box-shadow: -1px 3px 21px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: -1px 3px 21px 0px rgba(0,0,0,0.75);
+	box-shadow: -1px 3px 21px 0px rgba(0,0,0,0.75);
+}
+#sp_modal {
+	text-align: center;
+	width: 90%;
+	margin: 0 auto;
 }
