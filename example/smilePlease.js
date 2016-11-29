@@ -18,39 +18,8 @@
 
 var SP = (function () {
 	"use strict";
-	function selectHandler (e) {
-		e.preventDefault(); // cutting-off default behaviours 
-		e.stopPropagation(); // to prevent propagating to dblclick
 
-		this.selected = e.target;
-		console.log(this.selected);
-	}
-	
-	function editModeHandler (e) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		if(document.body.classList.toggle('sp_edit')) { // if added
-			document.body.addEventListener('click', selectHandler, true);
-		}
-		else {
-			document.body.removeEventListener('click', selectHandler, true);
-		}
-	}
-
-	function modalScreen () {
-		var modal = document.createElement('dialog');
-		modal.id = 'sp_modal';
-		document.body.appendChild(modal);
-	}
-
-	document.body.addEventListener('dblclick', editModeHandler, false);
-	modalScreen();
-
-	console.log('EditMode events triggered...!');
-	console.log('Use __(dom, [optional-callback]) for taking screengrabs');
-
-	return function (tg, cb) {
+	function _(tg, cb) {
 
 	 	tg = typeof tg === 'string' ? document.querySelector(tg) : tg;
 
@@ -199,6 +168,9 @@ var SP = (function () {
 
 				// document.body.appendChild(img);
 				var modal = document.getElementById('sp_modal');
+				var header = document.createElement('header');
+				header.textContent = "Here's the screenshot...! \n Do 'Right click' --> 'Save As' to export it out.";
+				modal.appendChild(header);
 				modal.appendChild(this.canvas);
 				modal.showModal();
 
@@ -208,7 +180,49 @@ var SP = (function () {
 
 		return new sp();
 
-	};
+	}
+
+	function selectHandler (e) {
+		e.preventDefault(); // cutting-off default behaviours 
+		e.stopPropagation(); // to prevent propagating to dblclick
+
+		this.selected = e.target;
+		console.log(this.selected);
+
+		_(this.selected);
+
+		document.body.classList.remove('sp_edit');
+		document.body.removeEventListener('click', selectHandler, true); // ONE-TIME event trigger
+	}
+	
+	function editModeHandler (e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if(document.body.classList.toggle('sp_edit')) { // if added
+			document.body.addEventListener('click', selectHandler, true);
+		}
+		else {
+			document.body.removeEventListener('click', selectHandler, true);
+		}
+	}
+
+	function modalScreen () {
+		var modal = document.createElement('dialog');
+		modal.id = 'sp_modal';
+		var header = document.createElement('header');
+		header.textContent = "Here's the screenshot...! \n Do 'Right click' --> 'Save As' to export it out.";
+		modal.appendChild(header);
+		document.body.appendChild(modal);
+	}
+
+	document.body.addEventListener('dblclick', editModeHandler, false);
+	modalScreen();
+
+	console.log('EditMode events triggered...!');
+	console.log('Use __(dom, [optional-callback]) for taking screengrabs');
+
+	return _;
 
 })();
 
