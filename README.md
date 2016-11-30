@@ -10,7 +10,8 @@ A js based lightweight library that can paint the current-state of look of the D
 
 ## Usage
 1. Web
-   - Include the lightweight lib script `smilePlease.js` using the cdn - https://raw.githubusercontent.com/venkatb4u/smile_please/master/example/smilePlease.js
+   - Include the lightweight lib script `smilePlease.js` using the cdn - 
+   https://cdn.rawgit.com/venkatb4u/smile_please/master/example/smilePlease.js
    
    usage 1:  `__();` (OR) `smilePlease();`   // if no DOM specified, 'document.body' is made to be default.
    
