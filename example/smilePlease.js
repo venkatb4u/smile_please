@@ -110,7 +110,9 @@ var SP = (function () {
 						sp.targetClone.style = sp.getStyles(sp.target, true); 
 					})(self);
 					
-					return Promise.all(promises);
+					Promise.all(promises).then(function(results) { // assuring if all of the inner-promises are resolved.
+						resolve(nodeCloneList);
+					});
 					
 				});
 			},
