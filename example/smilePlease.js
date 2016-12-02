@@ -53,6 +53,7 @@ var SP = (function () {
 
 			createCanvas: function () {
 				var canvas = document.createElement('canvas');
+				canvas.id = 'sp_canvas';
 				canvas.setAttribute('width', this.target.offsetWidth + 'px');
 				canvas.setAttribute('height', this.target.offsetHeight + 'px');
 				this.canvas = canvas;
@@ -80,25 +81,46 @@ var SP = (function () {
 			},
 
 			applyStyles: function (target) {
-				
-				var nodeList = target ? target.getElementsByTagName('*') : this.target.getElementsByTagName('*'),
-					nodeListLen = nodeList.length || 0;
-				var nodeCloneList = this.targetClone.getElementsByTagName('*');
+				var self = this;
+				return new Promise(function(resolve, reject) { 
+					var	nodeList = target ? target.getElementsByTagName('*') : self.target.getElementsByTagName('*'),
+						nodeListLen = nodeList.length || 0;
+					var nodeCloneList = self.targetClone.getElementsByTagName('*');
+					var promises = [];
+					while (nodeListLen--) {
+						promises.push((function(nodeListLen) { // to sustain in the loop with callback ops
+							return new Promise(function(res, rej) {
+								var cloneElem = nodeCloneList[nodeListLen];
+								if (cloneElem.nodeName === 'IMG') {
+									imgToDataUrl(cloneElem.src).then(function(dataUrl) {
+										cloneElem.src = dataUrl;
+										cloneElem.style = self.getStyles(nodeList[nodeListLen]);
+										res();
+									});
+								}
+								else {
+									cloneElem.style = self.getStyles(nodeList[nodeListLen]);	
+									res();
+								}
+							});
+						})(nodeListLen));
+					}
 
-				while (nodeListLen--) 
-					nodeCloneList[nodeListLen].style = this.getStyles(nodeList[nodeListLen]);
-
-				(function rootNodeStyleFix (sp) { // target tag style apply		
-					sp.targetClone.style = sp.getStyles(sp.target, true); 
-				})(this);
-				
-				return nodeCloneList;
+					(function rootNodeStyleFix (sp) { // target tag style apply		
+						sp.targetClone.style = sp.getStyles(sp.target, true); 
+					})(self);
+					
+					return Promise.all(promises);
+					
+				});
 			},
 
 			cookBlob: function (target) {
 				var target = target || this.targetClone;
 				
-				this.applyStyles();
+				this.applyStyles().then(function(response) {
+					console.log(response);
+				});
 
 				var xmlSer = new XMLSerializer(),
 					serialisedDom = xmlSer.serializeToString(target),
@@ -120,17 +142,39 @@ var SP = (function () {
 					url = DOMURL.createObjectURL(svg),
 					img = new Image();
 
-				img.onload = function () {
-					var imgWidth = img.width,
-						imgHeight = img.height;
+				function requestImage(imageUrl) {
+					return new Promise(function(resolve, reject) { 
+						var URL = window.URL || window.webkitURL,
+							req = new XMLHttpRequest();
+					    req.onload = function() {
+					      var img = new Image();
+					      img.setAttribute('crossOrigin', 'anonymous'); // this is to support CORS
 
-					self.canvas.width = imgWidth;
-					self.canvas.height = imgHeight;
+					      img.onload = function() {
+					        URL.revokeObjectURL(this.src);
+					        resolve(img);
+					      };
+					      img.onerror = function() {
+					      	reject(Error('img load err'));
+					      }
+					      
+					      img.src = URL.createObjectURL(req.response);
+					    };
+					    req.open("get", imageUrl, true);
+					    req.responseType = 'blob';
+					    req.send();
+					});
+				}
 
-				  	// self.ctx.drawImage(img, 0, 0, 500, 300, 0, 0, 500, 300);
-				  	self.ctx.drawImage(img, 0, 0);
-
-				  	try { // handling exception if canvas is tainted
+				requestImage(url).then(function(img) {
+					// console.log(url);
+				 //  	console.log(img);
+				    self.canvas.width = img.width;
+				    self.canvas.height = img.height;
+				    // self.ctx = self.canvas.getContext('2d');
+				    self.ctx.drawImage(img, 0, 0);
+				 	
+				 	try { // handling exception if canvas is tainted
 				  		var dataURL = self.canvas.toDataURL("image/png", 1.0);
     					dataURL.replace(/^data:image\/(png|jpg);base64,/, ""); 	
 				  	}
@@ -138,26 +182,50 @@ var SP = (function () {
 				  		console.log(e);
 				  	}
 				  	
-
 				  	dataURL && localStorage.setItem("savedImageData", dataURL);
-
-				  	// document.body.appendChild(img);
-				  	DOMURL.revokeObjectURL(url);
-
 				  	// callback trigger
 				  	self.cb && self.cb(self.canvas); 
-				}
 
-				img.setAttribute('crossOrigin', 'anonymous'); // this is to support CORS
-				img.setAttribute('width', this.canvas.width + 'px');
-				img.setAttribute('height', this.canvas.height + 'px');
-				img.src = url;
+				});
 
-				// make sure the load event fires for cached images too
-				if ( img.complete || img.complete === undefined ) {
-				    img.src = "http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG";
-				    img.src = url;
-				}
+				// img.onload = function () {
+				// 	var imgWidth = img.width,
+				// 		imgHeight = img.height;
+
+				// 	self.canvas.width = imgWidth;
+				// 	self.canvas.height = imgHeight;
+
+				//   	// self.ctx.drawImage(img, 0, 0, 500, 300, 0, 0, 500, 300);
+				//   	self.ctx.drawImage(img, 0, 0);
+
+				//   	try { // handling exception if canvas is tainted
+				//   		var dataURL = self.canvas.toDataURL("image/png", 1.0);
+    // 					dataURL.replace(/^data:image\/(png|jpg);base64,/, ""); 	
+				//   	}
+				//   	catch (e) {
+				//   		console.log(e);
+				//   	}
+				  	
+
+				//   	dataURL && localStorage.setItem("savedImageData", dataURL);
+
+				//   	// document.body.appendChild(img);
+				//   	DOMURL.revokeObjectURL(url);
+
+				//   	// callback trigger
+				//   	self.cb && self.cb(self.canvas); 
+				// }
+
+				// img.setAttribute('crossOrigin', 'anonymous'); // this is to support CORS
+				// img.setAttribute('width', this.canvas.width + 'px');
+				// img.setAttribute('height', this.canvas.height + 'px');
+				// img.src = url;
+
+				// // make sure the load event fires for cached images too
+				// if ( img.complete || img.complete === undefined ) {
+				//     img.src = "http://www.gravatar.com/avatar/0e39d18b89822d1d9871e0d1bc839d06?s=128&d=identicon&r=PG";
+				//     img.src = url;
+				// }
 
 				var modal = document.getElementById('sp_modal');
 				while (modal.firstChild)  // flushing off
@@ -240,6 +308,34 @@ var SP = (function () {
 
 	console.log('EditMode events triggered...!');
 	console.log('Use __(dom, [optional-callback]) for taking screengrabs');
+
+
+	// Image CORS exception handler
+	function imgToDataUrl (url) {
+		return new Promise(function(resolve, reject) { 
+		 	  var img = new Image();
+			  img.crossOrigin = 'Anonymous';
+			  img.onload = function() {
+			    var canvas = document.createElement('canvas');
+			    var ctx = canvas.getContext('2d');
+			    var dataURL;
+			    canvas.height = this.height;
+			    canvas.width = this.width;
+			    ctx.drawImage(this, 0, 0);
+			    dataURL = canvas.toDataURL('image/png');
+			    canvas = null;
+
+			    resolve(dataURL);
+
+			  };
+
+			  img.onerror = function() {
+			     reject(Error("img load error"));
+			  };
+
+			  img.src = url;
+		});
+	}
 
 	return _;
 

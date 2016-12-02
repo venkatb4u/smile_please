@@ -54,13 +54,12 @@
 
 	// Stats and Things
 		gulp.task('stats', function () {
-			gulp.src(dest + '/**/*')
+			gulp.src(dest + '/js/smilePlease.js')
 			.pipe(size())
 			.pipe(gulp.dest(dest));
 		});
 
-//
-	gulp.task('default', ['sass', 'uglify', 'imagemin']);
+	gulp.task('default', ['sass', 'uglify', 'imagemin', 'stats']);
 
 	gulp.task('watch', ['default'], function() {
 
