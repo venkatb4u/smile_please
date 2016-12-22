@@ -12,7 +12,7 @@
   -----
     *  __(); (OR) smilePlease();   // if no DOM specified, 'document.body' is made to be default
 
-	*  __(dom, [optional-callback]); (OR) smilePlease(dom, [optional -allback]);
+	*  __(dom, [optional-callback]); (OR) smilePlease(dom, [optional -callback]);
 	  e.g. __('#test'), __('.test', function(canvas) { document.body.appendChild(canvas) })
 
 	* Simply double-click on the page to toggle the 'EDIT' mode GUI and single click to select the DOM
@@ -127,7 +127,6 @@ var SP = (function () {
 					self.canvas.width = imgWidth;
 					self.canvas.height = imgHeight;
 
-				  	// self.ctx.drawImage(img, 0, 0, 500, 300, 0, 0, 500, 300);
 				  	self.ctx.drawImage(img, 0, 0);
 
 				  	try { // handling exception if canvas is tainted
