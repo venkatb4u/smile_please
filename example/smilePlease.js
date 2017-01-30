@@ -118,23 +118,36 @@ var SP = (function () {
 			},
 
 			cookBlob: function (target) {
-				var target = target || this.targetClone;
-				
-				this.applyStyles().then(function(response) {
-					console.log(response);
+				var self = this;
+				return new Promise(function(resolve, reject) { 
+					var target = target || self.targetClone;
+					self.applyStyles().then(function(response) {
+						console.log(response);
+						var xmlSer = new XMLSerializer(),
+						serialisedDom = xmlSer.serializeToString(target),
+						svgScaffold = '';
+
+						svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" id="sp_svg">' +
+										           '<foreignObject width="100%" height="100%">' +
+											           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
+											           		serialisedDom +
+											           '</div>' +
+										           '</foreignObject>' +
+									          '</svg>';
+						resolve(svgScaffold);
+					});
 				});
+				// var xmlSer = new XMLSerializer(),
+				// 	serialisedDom = xmlSer.serializeToString(target),
+				// 	svgScaffold = '';
 
-				var xmlSer = new XMLSerializer(),
-					serialisedDom = xmlSer.serializeToString(target),
-					svgScaffold = '';
-
-				return svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" id="sp_svg">' +
-								           '<foreignObject width="100%" height="100%">' +
-									           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
-									           		serialisedDom +
-									           '</div>' +
-								           '</foreignObject>' +
-							          '</svg>';
+				// return svgScaffold = '<svg xmlns="http://www.w3.org/2000/svg" id="sp_svg">' +
+				// 				           '<foreignObject width="100%" height="100%">' +
+				// 					           '<div xmlns="http://www.w3.org/1999/xhtml" id="sp_root">' +
+				// 					           		serialisedDom +
+				// 					           '</div>' +
+				// 				           '</foreignObject>' +
+				// 			          '</svg>';
 			},
 
 			render: function () {
